@@ -478,8 +478,8 @@ tbody tr:last-child td{border-bottom:none}
 // ════════════════════════════════════════
 //  STATE
 // ════════════════════════════════════════
-let barang     = JSON.parse(localStorage.getItem('kpro_barang') || '[]');
-let transaksi  = JSON.parse(localStorage.getItem('kpro_transaksi') || '[]');
+let barang     = JSON.parse(localStorage.getItem('kpro_barang_v2') || '[]');
+let transaksi  = JSON.parse(localStorage.getItem('kpro_transaksi_v2') || '[]');
 let cart       = [];
 let editId     = null;
 let deleteId   = null;
@@ -491,8 +491,8 @@ let activeCat  = 'Semua';
 function fmt(n){ return 'Rp ' + Number(n||0).toLocaleString('id-ID'); }
 function esc(s){ return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
 function save(){
-  localStorage.setItem('kpro_barang', JSON.stringify(barang));
-  localStorage.setItem('kpro_transaksi', JSON.stringify(transaksi));
+  localStorage.setItem('kpro_barang_v2', JSON.stringify(barang));
+  localStorage.setItem('kpro_transaksi_v2', JSON.stringify(transaksi));
 }
 function nextId(){ return barang.length ? Math.max(...barang.map(b=>b.id))+1 : 1; }
 
