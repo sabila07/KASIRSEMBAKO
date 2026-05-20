@@ -485,6 +485,17 @@ let editId     = null;
 let deleteId   = null;
 let activeCat  = 'Semua';
 
+// ════════════════════════════════════════
+//  UTILS
+// ════════════════════════════════════════
+function fmt(n){ return 'Rp ' + Number(n||0).toLocaleString('id-ID'); }
+function esc(s){ return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+function save(){
+  localStorage.setItem('kpro_barang', JSON.stringify(barang));
+  localStorage.setItem('kpro_transaksi', JSON.stringify(transaksi));
+}
+function nextId(){ return barang.length ? Math.max(...barang.map(b=>b.id))+1 : 1; }
+
 // ── Seed data awal ──
 if (!barang.length) {
   barang = [
@@ -503,17 +514,6 @@ if (!barang.length) {
   ];
   save();
 }
-
-// ════════════════════════════════════════
-//  UTILS
-// ════════════════════════════════════════
-const fmt  = n => 'Rp ' + Number(n||0).toLocaleString('id-ID');
-const esc  = s => String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
-const save = ()=>{
-  localStorage.setItem('kpro_barang', JSON.stringify(barang));
-  localStorage.setItem('kpro_transaksi', JSON.stringify(transaksi));
-};
-const nextId = ()=> barang.length ? Math.max(...barang.map(b=>b.id))+1 : 1;
 
 let toastTimer;
 function showToast(msg, type=''){
