@@ -229,8 +229,14 @@ tbody tr:last-child td{border-bottom:none}
 .cm-cancel{background:var(--bg);color:var(--text)}
 
 /* ── TOAST ── */
-.toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%) translateY(60px);background:#0f172a;color:#fff;padding:11px 22px;border-radius:10px;font-size:.85rem;font-weight:600;opacity:0;transition:.3s;z-index:500;white-space:nowrap}
+.toast{position:fixed;top:70px;left:50%;transform:translateX(-50%) translateY(-20px);background:#0f172a;color:#fff;padding:14px 28px;border-radius:12px;font-size:.95rem;font-weight:700;opacity:0;transition:.3s;z-index:9999;white-space:nowrap;box-shadow:0 8px 24px rgba(0,0,0,.3)}
 .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+.toast.success{background:#15803d}
+.toast.error{background:#b91c1c}
+
+/* ── Input Error ── */
+.fg input.err,.fg select.err{border-color:#dc2626!important;background:#fff5f5!important}
+.fg .err-msg{font-size:.75rem;color:#dc2626;margin-top:3px}
 
 /* ── SCROLLBAR ── */
 ::-webkit-scrollbar{width:5px;height:5px}
@@ -510,12 +516,12 @@ const save = ()=>{
 const nextId = ()=> barang.length ? Math.max(...barang.map(b=>b.id))+1 : 1;
 
 let toastTimer;
-function showToast(msg){
+function showToast(msg, type=''){
   const t = document.getElementById('toast');
   t.textContent = msg;
-  t.classList.add('show');
+  t.className = 'toast show' + (type ? ' '+type : '');
   clearTimeout(toastTimer);
-  toastTimer = setTimeout(()=>t.classList.remove('show'), 2600);
+  toastTimer = setTimeout(()=>{ t.className='toast'; }, 3000);
 }
 
 function goPage(name, btn){
@@ -737,7 +743,23 @@ function closeReceipt(){ document.getElementById('receiptOverlay').classList.rem
 // ════════════════════════════════════════
 //  STOK MANAGEMENT
 // ════════════════════════════════════════
+function setErr(id, msg){
+  const el = document.getElementById(id);
+  el.classList.add('err');
+  let em = el.parentNode.querySelector('.err-msg');
+  if(!em){ em = document.createElement('span'); em.className='err-msg'; el.parentNode.appendChild(em); }
+  em.textContent = msg;
+}
+function clearErrs(){
+  document.querySelectorAll('.fg input.err, .fg select.err').forEach(el=>{
+    el.classList.remove('err');
+    const em = el.parentNode.querySelector('.err-msg');
+    if(em) em.remove();
+  });
+}
+
 function simpanBarang(){
+  clearErrs();
   const nama  = document.getElementById('fNama').value.trim();
   const kat   = document.getElementById('fKat').value;
   const beli  = parseFloat(document.getElementById('fBeli').value);
@@ -745,20 +767,22 @@ function simpanBarang(){
   const stok  = parseInt(document.getElementById('fStok').value);
   const satuan= document.getElementById('fSatuan').value.trim()||'pcs';
 
-  if(!nama)              return showToast('⚠️ Nama barang wajib diisi!');
-  if(isNaN(beli)||beli<0) return showToast('⚠️ Harga beli tidak valid!');
-  if(isNaN(jual)||jual<0) return showToast('⚠️ Harga jual tidak valid!');
-  if(isNaN(stok)||stok<0) return showToast('⚠️ Stok tidak valid!');
+  let valid = true;
+  if(!nama)               { setErr('fNama','Nama barang wajib diisi'); valid=false; }
+  if(isNaN(beli)||beli<0) { setErr('fBeli','Harga beli tidak valid');  valid=false; }
+  if(isNaN(jual)||jual<0) { setErr('fJual','Harga jual tidak valid');  valid=false; }
+  if(isNaN(stok)||stok<0) { setErr('fStok','Stok tidak valid');        valid=false; }
+  if(!valid){ showToast('⚠️ Periksa kembali form isian!','error'); return; }
 
   if(editId!==null){
     const idx = barang.findIndex(b=>b.id===editId);
     barang[idx] = {id:editId,nama,kat,beli,jual,stok,satuan};
-    showToast('✅ Barang berhasil diperbarui!');
     editId=null;
     document.getElementById('formLabel').textContent='Tambah Barang';
+    showToast('✅ Barang berhasil diperbarui!','success');
   } else {
     barang.push({id:nextId(),nama,kat,beli,jual,stok,satuan});
-    showToast('✅ Barang berhasil ditambahkan!');
+    showToast('✅ Barang berhasil ditambahkan!','success');
   }
   save(); resetStokForm(); renderStok(); renderCategories(); renderProducts();
 }
